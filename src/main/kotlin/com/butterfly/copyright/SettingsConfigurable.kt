@@ -17,6 +17,9 @@ class SettingsConfigurable: PersistentStateComponent<SettingsConfigurable> {
     var isFeatureEnabled: Boolean = false
 
     @Attribute
+    var isKt: Boolean = false
+
+    @Attribute
     var numberOption: Int = 10
 
     companion object {

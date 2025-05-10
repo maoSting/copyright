@@ -10,6 +10,7 @@ class SettingComponent : Configurable {
     private var panel: DialogPanel? = null
     private var setting1: String = ""
     private var setting2: Boolean = false
+    private var isKTSetting: Boolean = false
     private var setting3: Int = 0
 
     override fun getDisplayName() = "My Plugin Settings"
@@ -42,6 +43,14 @@ class SettingComponent : Configurable {
                         }
                         .gap(RightGap.SMALL)
 
+                    checkBox("Is KT")
+                        .bindSelected(::isKTSetting)
+                        .onChanged { checkBox ->
+                            isKTSetting = checkBox.isSelected
+                            println("setting2: $isKTSetting")
+                        }
+                        .gap(RightGap.SMALL)
+
                     contextHelp("When enabled, activates advanced functionality")
                 }
 
@@ -62,6 +71,7 @@ class SettingComponent : Configurable {
         val settings = SettingsConfigurable.getInstance()
         return setting1 != settings.configValue ||
                 setting2 != settings.isFeatureEnabled ||
+                isKTSetting != settings.isKt ||
                 setting3 != settings.numberOption
     }
 
@@ -69,6 +79,7 @@ class SettingComponent : Configurable {
         val settings = SettingsConfigurable.getInstance()
         settings.configValue = setting1
         settings.isFeatureEnabled = setting2
+        settings.isKt = isKTSetting
         settings.numberOption = setting3
     }
 
@@ -76,6 +87,7 @@ class SettingComponent : Configurable {
         val settings = SettingsConfigurable.getInstance()
         setting1 = settings.configValue
         setting2 = settings.isFeatureEnabled
+        isKTSetting = settings.isKt
         setting3 = settings.numberOption
     }
 }
