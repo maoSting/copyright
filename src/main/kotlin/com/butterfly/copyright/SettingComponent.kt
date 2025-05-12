@@ -20,6 +20,7 @@ class SettingComponent : Configurable {
         val settings = SettingsConfigurable.getInstance()
         setting1 = settings.configValue
         setting2 = settings.isFeatureEnabled
+        isKTSetting = settings.isKt
         setting3 = settings.numberOption
 
         panel = panel {
