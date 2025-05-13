@@ -1,5 +1,18 @@
 package com.butterfly.copyright
 
+import org.apache.poi.wp.usermodel.HeaderFooterType
+import org.apache.poi.xwpf.usermodel.*
+import org.apache.xmlbeans.impl.xb.xmlschema.SpaceAttribute
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSettings
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STFldCharType
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTabJc
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+import java.io.IOException
+import java.math.BigInteger
+
 class CodeDocxGenerator {
     private var PROJECT_PATH = "" // 项目路径
     private var DOC_SAVE_PATH = "" // 生成的源代码Word文档的保存路径
@@ -110,17 +123,20 @@ class CodeDocxGenerator {
         // 下面三个步骤就是创建左大括号{、域代码内容、右大括号}
         // 创建左大括号{
         val run = paragraph.createRun()
-        val fldChar = run.cTR.addNewFldChar()
+
+        val fldChar = run.ctr.addNewFldChar()
         fldChar.fldCharType = STFldCharType.Enum.forString("begin")
 
         // 创建域代码内容
         val run2 = paragraph.createRun()
-        val ctText = run2.cTR.addNewInstrText()
+        val ctText = run2.ctr.addNewInstrText()
+
+
         ctText.stringValue = "PAGE  \\* MERGEFORMAT"
         ctText.space = SpaceAttribute.Space.Enum.forString("preserve")
 
         // 创建右大括号}
-        val fldChar2 = run2.cTR.addNewFldChar()
+        val fldChar2 = run2.ctr.addNewFldChar()
         fldChar2.fldCharType = STFldCharType.Enum.forString("end")
     }
 
@@ -141,11 +157,11 @@ class CodeDocxGenerator {
             // 反射添加页眉
             val filedSet = XWPFDocument::class.java.getDeclaredField("settings")
             filedSet.isAccessible = true
-            val xwpfsettings = filedSet.get(doc) as XWPFSettings
+            val xwpfSettings = filedSet.get(doc) as XWPFSettings
 
             val filedCtSet = XWPFSettings::class.java.getDeclaredField("ctSettings")
             filedCtSet.isAccessible = true
-            val ctSettings = filedCtSet.get(xwpfsettings) as CTSettings
+            val ctSettings = filedCtSet.get(xwpfSettings) as CTSettings
             ctSettings.addNewEvenAndOddHeaders()
 
             // 获取文档页数
@@ -156,7 +172,8 @@ class CodeDocxGenerator {
             doc.close()
             MsgHintUtil.showFinishHint(DOC_SAVE_PATH, pageNums, totalLines)
         } catch (e: Exception) {
-            LogUtils.error("Word添加页眉出错：${e.message}")
+//            LogUtils.error("Word添加页眉出错：${e.message}")
+            println("Word添加页眉出错：$e.message")
         }
     }
 
@@ -171,7 +188,7 @@ class CodeDocxGenerator {
         paragraph.verticalAlignment = TextAlignment.CENTER // 页眉内容垂直居中
 
         // 创建tab，用于定位页码，让页码居右显示
-        val tabStop = paragraph.cTP.pPr.addNewTabs().addNewTab()
+        val tabStop = paragraph.ctp.pPr.addNewTabs().addNewTab()
         tabStop.`val` = STTabJc.RIGHT
         val twipsPerInch = 720
         tabStop.pos = BigInteger.valueOf(15L * twipsPerInch)
@@ -212,6 +229,7 @@ class CodeDocxGenerator {
         paragraph.alignment = ParagraphAlignment.LEFT
         paragraph.spacingLineRule = LineSpacingRule.EXACT
 
+
         val lines = FileUtils.readFile(filePath)
         lines.forEachIndexed { index, line ->
             val run = paragraph.createRun() // 创建段落文本
@@ -236,9 +254,11 @@ class CodeDocxGenerator {
                 doc.write(fout)
             }
         } catch (e: FileNotFoundException) {
-            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
+//            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
+            println("保存Word文档到本地时发生错误：$e.message")
         } catch (e: IOException) {
-            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
+//            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
+            println("保存Word文档到本地时发生错误：$e.message")
         }
     }
 }

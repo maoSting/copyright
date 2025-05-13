@@ -19,6 +19,11 @@ intellij {
 
     plugins.set(listOf(/* Plugin Dependencies */))
 }
+dependencies {
+    // 第三方依赖示例
+    implementation("org.apache.poi:poi-ooxml:3.17")
+    implementation("org.apache.poi:ooxml-schemas:1.3")
+}
 
 tasks {
     // Set the JVM compatibility versions
