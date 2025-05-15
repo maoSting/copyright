@@ -42,32 +42,30 @@ object FileUtils {
      * @param filePath
      * @return
      */
-    companion object {
-        fun readFile(filePath: String?): List<String> {
-            if (filePath == null || File(filePath).isDirectory) {
-                return emptyList()
-            }
-            val lines = mutableListOf<String>()
-            try {
-                BufferedReader(FileReader(File(filePath))).use { reader ->
-                    var line = reader.readLine()
-                    while (line != null) {
-                        if (filterLine(line)) { // 过滤不符合要求的代码行
-                            lines.add(line)
-                        }
-                        line = reader.readLine()
-                    }
-                }
-                return lines
-            } catch (e: FileNotFoundException) {
-//            LogUtils.error("读取文件<$filePath>出错：${e.message}")
-                println("读取文件<$filePath>出错：${e.message}")
-            } catch (e: IOException) {
-//            LogUtils.error("读取文件<$filePath>出错：${e.message}")
-                println("读取文件<$filePath>出错：${e.message}")
-            }
+    fun readFile(filePath: String?): List<String> {
+        if (filePath == null || File(filePath).isDirectory) {
             return emptyList()
         }
+        val lines = mutableListOf<String>()
+        try {
+            BufferedReader(FileReader(File(filePath))).use { reader ->
+                var line = reader.readLine()
+                while (line != null) {
+                    if (filterLine(line)) { // 过滤不符合要求的代码行
+                        lines.add(line)
+                    }
+                    line = reader.readLine()
+                }
+            }
+            return lines
+        } catch (e: FileNotFoundException) {
+//            LogUtils.error("读取文件<$filePath>出错：${e.message}")
+            println("读取文件<$filePath>出错：${e.message}")
+        } catch (e: IOException) {
+//            LogUtils.error("读取文件<$filePath>出错：${e.message}")
+            println("读取文件<$filePath>出错：${e.message}")
+        }
+        return emptyList()
     }
 
 
@@ -76,7 +74,7 @@ object FileUtils {
      * @param line
      * @return
      */
-    fun filterLine(line: String?): Boolean {
+    private fun filterLine(line: String?): Boolean {
         // 过滤空行
         if (line == null || line.trim().isEmpty()) {
             return false
