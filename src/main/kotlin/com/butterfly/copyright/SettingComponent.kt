@@ -2,66 +2,91 @@ package com.butterfly.copyright
 
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
-import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
+import javax.swing.ButtonGroup
 import javax.swing.JComponent
 
 class SettingComponent : Configurable {
     private var panel: DialogPanel? = null
-    private var setting1: String = ""
-    private var setting2: Boolean = false
-    private var isKTSetting: Boolean = false
-    private var setting3: Int = 0
+    private var softwareName: String = ""
+    private var softwareVersion: String = ""
+    private var softwareFiles: String = ""
+    private val writeList = listOf("顺序写入60页", "前后各30页")
+    private var writeWay: Int = 1
+    private var ignoreDirs: String = ""
+
 
     override fun getDisplayName() = "My Plugin Settings"
 
     override fun createComponent(): JComponent {
         // 从持久化存储加载初始值
         val settings = SettingsConfigurable.getInstance()
-        setting1 = settings.configValue
-        setting2 = settings.isFeatureEnabled
-        isKTSetting = settings.isKt
-        setting3 = settings.numberOption
+        softwareName = settings.softwareName
+        softwareVersion = settings.softwareVersion
+        softwareFiles = settings.softwareFiles
+        writeWay = settings.writeWay
+        ignoreDirs = settings.ignoreDirs
 
         panel = panel {
-            group("Basic Settings") {
-                row("Configuration Value:") {
+            group("设置") {
+                row("软件名称：") {
                     textField()
-                        .bindText(::setting1)
+                        .bindText(::softwareName)
                         .onChanged { textField ->
-                            setting1 = textField.text
-                            println("setting2: $setting1")
+                            softwareName = textField.text
                         }
-                        .comment("Enter your configuration value here")
+                        .comment("Place typing software name")
                 }
-
-                row {
-                    checkBox("Enable")
-                        .bindSelected(::setting2)
-                        .onChanged { checkBox ->
-                            setting2 = checkBox.isSelected
-                            println("setting2: $setting2")
+                row("软件版本：") {
+                    textField()
+                        .bindText(::softwareVersion)
+                        .onChanged { textField ->
+                            softwareVersion = textField.text
                         }
-                        .gap(RightGap.SMALL)
-
-                    checkBox("Is KT")
-                        .bindSelected(::isKTSetting)
-                        .onChanged { checkBox ->
-                            isKTSetting = checkBox.isSelected
-                            println("setting2: $isKTSetting")
-                        }
-                        .gap(RightGap.SMALL)
-
-                    contextHelp("When enabled, activates advanced functionality")
+                        .comment("Place typing software version")
                 }
-
-                row("Number Option:") {
-                    intTextField(1..100)
-                        .bindIntText(::setting3)
-                        .onChanged { field ->
-                            setting3 = field.text.toIntOrNull()!!
-                            println("setting3: $setting3")
+                row("文件类型：") {
+                    textField()
+                        .bindText(::softwareFiles)
+                        .onChanged { textField ->
+                            softwareFiles = textField.text
                         }
+                        .comment("请输入文件后缀名，并用空格分割。.java .js")
+
+//                    contextHelp(".java .xml")
+                }
+                buttonsGroup ("写入顺序：") {
+                    row {
+                        radioButton("顺序写入", 0)
+                    }
+                    row {
+                        radioButton("前后各30页", 1)
+                    }
+                }.bind({ writeWay }, { writeWay = it })
+
+//
+//
+//                val buttonGroup = ButtonGroup()
+//
+//                group("Theme Settings") {
+//                    writeList.forEachIndexed { index, theme ->
+//                        row {
+//                            radioButton(theme, buttonGroup)
+//                                .selected(index == writeWay)
+//                                .onChanged { radio ->
+//                                    if (radio.isSelected) writeWay = index
+//                                }
+//                        }
+//                    }
+//                }
+
+                row("忽略目录：") {
+                    textField()
+                        .bindText(::ignoreDirs)
+                        .onChanged { textField ->
+                            ignoreDirs = textField.text
+                        }
+                        .comment("Place typing include dirs")
                 }
             }
         }
@@ -70,25 +95,28 @@ class SettingComponent : Configurable {
 
     override fun isModified(): Boolean {
         val settings = SettingsConfigurable.getInstance()
-        return setting1 != settings.configValue ||
-                setting2 != settings.isFeatureEnabled ||
-                isKTSetting != settings.isKt ||
-                setting3 != settings.numberOption
+        return softwareName != settings.softwareName ||
+                softwareVersion != settings.softwareVersion ||
+                softwareFiles != settings.softwareFiles ||
+                writeWay != settings.writeWay ||
+                ignoreDirs != settings.ignoreDirs
     }
 
     override fun apply() {
         val settings = SettingsConfigurable.getInstance()
-        settings.configValue = setting1
-        settings.isFeatureEnabled = setting2
-        settings.isKt = isKTSetting
-        settings.numberOption = setting3
+        settings.softwareName = softwareName
+        settings.softwareVersion = softwareVersion
+        settings.softwareFiles = softwareFiles
+        settings.writeWay = writeWay
+        settings.ignoreDirs = ignoreDirs
     }
 
     override fun reset() {
         val settings = SettingsConfigurable.getInstance()
-        setting1 = settings.configValue
-        setting2 = settings.isFeatureEnabled
-        isKTSetting = settings.isKt
-        setting3 = settings.numberOption
+        softwareName = settings.softwareName
+        softwareVersion = settings.softwareVersion
+        softwareFiles = settings.softwareFiles
+        writeWay = settings.writeWay
+        ignoreDirs = settings.ignoreDirs
     }
 }

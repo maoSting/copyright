@@ -3,7 +3,6 @@ package com.butterfly.copyright
 import org.apache.poi.wp.usermodel.HeaderFooterType
 import org.apache.poi.xwpf.usermodel.*
 import org.apache.xmlbeans.impl.xb.xmlschema.SpaceAttribute
-import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSettings
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STFldCharType
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTabJc
 import java.io.File
@@ -29,7 +28,7 @@ class CodeDocxGenerator {
     /**
      * 开始
      */
-    fun start(args: Array<String>?, ignoreDirs: List<String>?) {
+    fun start(args: List<String>?, ignoreDirs: List<String>?) {
         println("开始")
         // 四个参数处理：项目源代码目录、软件名称、版本号、源码文件类型
         if (args == null || args.size < 5) {
@@ -56,12 +55,44 @@ class CodeDocxGenerator {
         println("软件名称：${args[1]}")
         println("版本号：${args[2]}")
         println("源代码文件类型：")
-        FILE_TYPES.forEach(LogUtils::print)
+        FILE_TYPES.forEach { fileName ->
+            println(fileName)
+        }
         println("写入方式：${if (IS_HALF) "前后各30页" else "顺序60页"}")
         println("扫描忽略目录：")
-        IGNORE_DIRS.forEach(LogUtils::print)
+        IGNORE_DIRS.forEach { dir ->
+            println(dir)
+        }
         generateSourceCodeDocx(PROJECT_PATH)
     }
+
+//    /**
+//     * 生成源代码Word文档
+//     */
+//    private fun generateSourceCodeDocx(projectPath: String) {
+//        //扫描项目中符合要求的文件
+//        println("开始扫描文件")
+//        val files = FileUtils.scanFiles(projectPath, FILE_TYPES, IGNORE_DIRS)
+//        println("扫描文件完成")
+//        println("文件总数：${files.size}")
+//        if (files.isEmpty()) {
+//            println("未扫描到符合要求的文件")
+//            MsgHintUtil.showHint("未扫描到符合要求的文件")
+//            return
+//        }
+//        println("1")
+//        // 创建一个Word：存放源代码
+//        val doc = XWPFDocument()
+//        println("2")
+//
+//        println("写入Word文档完成")
+//        println("Word文档输出目录：$DOC_SAVE_PATH")
+//        // 保存Word文档
+//        saveDocx(doc, DOC_SAVE_PATH)
+//        println("统计代码行数：$totalLines")
+//        // Word添加页眉：显示软件名称、版本号和页码
+//        println("结束")
+//    }
 
     /**
      * 生成源代码Word文档
@@ -73,10 +104,10 @@ class CodeDocxGenerator {
         println("扫描文件完成")
         println("文件总数：${files.size}")
         if (files.isEmpty()) {
+            println("未扫描到符合要求的文件")
             MsgHintUtil.showHint("未扫描到符合要求的文件")
             return
         }
-
         // 创建一个Word：存放源代码
         val doc = XWPFDocument()
         // 设置Word的页边距：保证每页不少于50行代码，且尽量保证每行代码不换行
@@ -155,14 +186,14 @@ class CodeDocxGenerator {
             createPageHeader(doc, HeaderFooterType.DEFAULT, header)
 
             // 反射添加页眉
-            val filedSet = XWPFDocument::class.java.getDeclaredField("settings")
-            filedSet.isAccessible = true
-            val xwpfSettings = filedSet.get(doc) as XWPFSettings
-
-            val filedCtSet = XWPFSettings::class.java.getDeclaredField("ctSettings")
-            filedCtSet.isAccessible = true
-            val ctSettings = filedCtSet.get(xwpfSettings) as CTSettings
-            ctSettings.addNewEvenAndOddHeaders()
+//            val filedSet = XWPFDocument::class.java.getDeclaredField("settings")
+//            filedSet.isAccessible = true
+//            val xwpfSettings = filedSet.get(doc) as XWPFSettings
+//
+//            val filedCtSet = XWPFSettings::class.java.getDeclaredFields("ctSettings")
+//            filedCtSet.isAccessible = true
+//            val ctSettings = filedCtSet.get(xwpfSettings) as CTSettings
+//            ctSettings.addNewEvenAndOddHeaders()
 
             // 获取文档页数
             val pageNums = totalLines / PAGE_LINES + 1 // 根据统计的代码行数计算总页数
@@ -190,8 +221,7 @@ class CodeDocxGenerator {
         // 创建tab，用于定位页码，让页码居右显示
         val tabStop = paragraph.ctp.pPr.addNewTabs().addNewTab()
         tabStop.`val` = STTabJc.RIGHT
-        val twipsPerInch = 720
-        tabStop.pos = BigInteger.valueOf(15L * twipsPerInch)
+        tabStop.pos = BigInteger.valueOf(15L * 720)
 
         // 创建显示header的XWPFRun，XWPFRun代表一个文本显示区域
         val run = paragraph.createRun()
@@ -216,7 +246,6 @@ class CodeDocxGenerator {
      * 单个源码文件写入Word
      */
     private fun writeFileToDocx(filePath: String, doc: XWPFDocument) {
-        println(filePath)
         // 写入文件标题
         val titleP = doc.createParagraph() // 新建文件标题段落
         val titleRun = titleP.createRun() // 创建段落文本
@@ -254,11 +283,9 @@ class CodeDocxGenerator {
                 doc.write(fout)
             }
         } catch (e: FileNotFoundException) {
-//            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
-            println("保存Word文档到本地时发生错误：$e.message")
+            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
         } catch (e: IOException) {
-//            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
-            println("保存Word文档到本地时发生错误：$e.message")
+            LogUtils.error("保存Word文档到本地时发生错误：${e.message}")
         }
     }
 }

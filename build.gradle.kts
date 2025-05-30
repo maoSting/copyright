@@ -8,6 +8,10 @@ group = "com.butterfly"
 version = "1.0-SNAPSHOT"
 
 repositories {
+    // 使用阿里云镜像
+    maven { url = uri("https://maven.aliyun.com/repository/public") }
+    maven { url = uri("https://maven.aliyun.com/repository/jcenter") }
+
     mavenCentral()
 }
 
@@ -20,9 +24,8 @@ intellij {
     plugins.set(listOf(/* Plugin Dependencies */))
 }
 dependencies {
-    // 第三方依赖示例
-    implementation("org.apache.poi:poi-ooxml:3.17")
-    implementation("org.apache.poi:ooxml-schemas:1.3")
+    implementation("org.apache.poi:poi:5.2.3")
+    implementation("org.apache.poi:poi-ooxml:5.2.3") // 用于处理 .docx 格式
 }
 
 tasks {

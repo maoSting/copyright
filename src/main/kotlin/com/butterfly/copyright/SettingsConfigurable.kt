@@ -11,16 +11,20 @@ import com.intellij.util.xmlb.annotations.Attribute
 @State(name = "CopyrightSettings", storages = [Storage("copyright-settings.xml")])
 class SettingsConfigurable: PersistentStateComponent<SettingsConfigurable> {
     @Attribute
-    var configValue: String = "default"
+    var softwareName: String = ""
 
     @Attribute
-    var isFeatureEnabled: Boolean = false
+    var softwareVersion: String = ""
 
     @Attribute
-    var isKt: Boolean = false
+    var softwareFiles: String = ""
 
     @Attribute
-    var numberOption: Int = 10
+    var writeWay: Int = 1
+
+    @Attribute
+    var ignoreDirs: String = ""
+
 
     companion object {
         fun getInstance(): SettingsConfigurable = service()
